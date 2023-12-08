@@ -22,6 +22,7 @@ python gpsjsonplot.py --json input.json --outfile output.png --every 10
 -    `--json`: Path to the input JSON file containing GPS data.
 -    `--outfile`: Path to the output image file where the plot will be saved.
 -    `--every`: Optional parameter to select every n-th line from the input JSON file (default is 10).
+-    `--contour`: Optional: number of contour lines. 0 - disables it.
 
 ## Script Overview
 

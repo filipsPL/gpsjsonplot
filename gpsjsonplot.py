@@ -19,11 +19,13 @@ parser = argparse.ArgumentParser(description="Process some integers.")
 parser.add_argument("--json", dest="jsonfile", required=True, help="input json file")
 parser.add_argument("--outfile", dest="outfile", required=True, help="output image file")
 parser.add_argument("--every", dest="every", default=10, type=int, help="select every n-th line")
+parser.add_argument("--contour", dest="contour", default=6, type=int, help="number of contour lines, 0-disables")
 
 args = parser.parse_args()
 jsonfile = args.jsonfile
 outfile = args.outfile
 every = args.every
+contour = args.contour
 
 # -------------------------------------------------------- #
 
@@ -31,7 +33,6 @@ every = args.every
 with open(jsonfile, "r") as file:
     # data = [json.loads(line) for line in file]
     data = [json.loads(line) for i, line in enumerate(file) if i % every == 0 and json.loads(line).get("class") == "TPV"]
-
 
 # -------------------------------------------------------- #
 
@@ -57,10 +58,6 @@ std_latitude = np.std(latitude_meters)
 std_longitude = np.std(longitude_meters)
 
 
-# Convert mean latitude and longitude to meters
-mean_latitude_meters = 0
-mean_longitude_meters = 0
-
 
 # Calculate maximum absolute values for latitude and longitude
 max_abs_latitude = max(np.abs(latitude_meters))
@@ -69,6 +66,10 @@ max_abs_longitude = max(np.abs(longitude_meters))
 # Set explicit limits for the axes based on maximum absolute values
 lim = max(max_abs_longitude, max_abs_latitude)
 
+
+# Convert mean latitude and longitude to meters
+mean_latitude_meters = 0
+mean_longitude_meters = 0
 
 # ------------------------------------------------------------------ #
 
@@ -89,7 +90,7 @@ g = sns.jointplot(
     marginal_kws=dict(fill=True, log_scale=False, color="silver", stat="density"),
 )
 
-g.plot_joint(sns.kdeplot, color="r", zorder=5, levels=6)
+g.plot_joint(sns.kdeplot, color="r", zorder=5, levels=contour)
 # g.plot_marginals(sns.rugplot, color="r", height=-.15, clip_on=False)
 g.plot_marginals(sns.kdeplot, color="silver", fill=True)
 
