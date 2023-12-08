@@ -65,7 +65,7 @@ max_abs_latitude = max(np.abs(latitude_meters))
 max_abs_longitude = max(np.abs(longitude_meters))
 
 # Set explicit limits for the axes based on maximum absolute values
-lim = max(max_abs_longitude, max_abs_latitude)
+lim = np.ceil(max(max_abs_longitude, max_abs_latitude))
 
 
 # Convert mean latitude and longitude to meters
