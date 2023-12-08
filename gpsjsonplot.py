@@ -41,6 +41,7 @@ latitude = [entry["lat"] for entry in data]
 longitude = [entry["lon"] for entry in data]
 altitude = [entry["alt"] for entry in data]
 
+points = len(latitude)
 
 # Calculate mean latitude and longitude
 mean_latitude = np.mean(latitude)
@@ -100,7 +101,7 @@ g.set_axis_labels("Longitude (meters from mean)", "Latitude (meters from mean)")
 plt.scatter(0, 0, color="red", marker="x", s=100, label="Mean Location")
 
 # Display mean and std in the top right corner
-text_str = f"STD: alt: {std_altitude:.2f}m lat: {std_latitude:.2f}m, lon: {std_longitude:.2f}m"
+text_str = f"{points:} points. STD: alt: {std_altitude:.2f}m lat: {std_latitude:.2f}m, lon: {std_longitude:.2f}m"
 
 plt.text(
     0.5,
