@@ -16,29 +16,44 @@ from datetime import datetime
 parser = argparse.ArgumentParser(description="Process some integers.")
 parser.add_argument("--json", dest="jsonfile", required=True, help="input json file")
 parser.add_argument("--outfile", dest="outfile", required=True, help="output image file")
-parser.add_argument("--every", dest="every", default=10, type=int, help="select every n-th line")
+parser.add_argument("--n", dest="n", default=50, type=int, help="sample n points; n=0 - get all points")
 parser.add_argument("--contour", dest="contour", default=6, type=int, help="number of contour lines, 0-disables")
 
 args = parser.parse_args()
 jsonfile = args.jsonfile
 outfile = args.outfile
-every = args.every
+n = args.n
 contour = args.contour
 
 # -------------------------------------------------------- #
 
-# Read JSON data from the file
-with open(jsonfile, "r") as file:
+def read_uniform_sample(jsonfile, n):
     data = []
-    for i, line in enumerate(file):
-        try:
-            json_data = json.loads(line)
-            # Check if the "class" is "SKY"
-            if json_data.get("class") == "TPV" and i % every == 0:
-                data.append(json_data)
-        except json.decoder.JSONDecodeError as e:
-            print(f"Error decoding JSON at line {i + 1}: {e}")
-            #print("Problematic JSON:", line.strip())
+    with open(jsonfile, "r") as file:
+        # Read all lines from the file
+        all_lines = file.readlines()
+
+        if n == 0:
+            # If n is 0, read all lines
+            n = len(all_lines)
+
+        step_size = max(len(all_lines) // n, 1)
+
+        for i in range(0, len(all_lines), step_size):
+            line = all_lines[i]
+            try:
+                json_data = json.loads(line)
+                # Check if the "class" is "TPV"
+                if json_data.get("class") == "TPV":
+                    data.append(json_data)
+            except json.decoder.JSONDecodeError as e:
+                print(f"Error decoding JSON at line {i + 1}: {e}")
+                # print("Problematic JSON:", line.strip())
+
+    return data
+
+
+data = read_uniform_sample(jsonfile, n)
 
 # -------------------------------------------------------- #
 

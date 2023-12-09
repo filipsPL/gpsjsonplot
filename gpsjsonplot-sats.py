@@ -39,32 +39,48 @@ def plot_satellites(data, last=False):
     color = "orange" if last else colors
     size = 50 if last else 10
 
-    plt.scatter(np.radians(angles), elevations, color=color, marker=marker, alpha=0.85, edgecolor="black", linewidth=0.3, s=size)
+    plt.scatter(np.radians(angles), elevations, color=color, marker=marker, alpha=0.85, edgecolor="black", linewidth=0.1, s=size)
 
+def read_uniform_sample(jsonfile, n):
+    data = []
+    with open(jsonfile, "r") as file:
+        # Read all lines from the file
+        all_lines = file.readlines()
+
+        if n == 0:
+            # If n is 0, read all lines
+            n = len(all_lines)
+
+        step_size = max(len(all_lines) // n, 1)
+
+        for i in range(0, len(all_lines), step_size):
+            line = all_lines[i]
+            try:
+                json_data = json.loads(line)
+                # Check if the "class" is "SKY"
+                if json_data.get("class") == "SKY":
+                    data.append(json_data)
+            except json.decoder.JSONDecodeError as e:
+                print(f"Error decoding JSON at line {i + 1}: {e}")
+                # print("Problematic JSON:", line.strip())
+
+    return data
 
 # Use argparse to get file names and other parameters
 parser = argparse.ArgumentParser(description="Plot satellite positions from JSON data.")
 parser.add_argument("--json", dest="jsonfile", required=True, help="input json file")
 parser.add_argument("--outfile", dest="outfile", required=True, help="output image file")
-parser.add_argument("--every", dest="every", default=10, type=int, help="select every n-th line")
+parser.add_argument("--n", dest="n", default=50, type=int, help="sample n points; n=0 - get all points")
 
 args = parser.parse_args()
 jsonfile = args.jsonfile
 outfile = args.outfile
-every = args.every
+n = args.n
 
-# Read JSON data from the file
-with open(jsonfile, "r") as file:
-    data = []
-    for i, line in enumerate(file):
-        try:
-            json_data = json.loads(line)
-            # Check if the "class" is "SKY"
-            if json_data.get("class") == "SKY" and i % every == 0:
-                data.append(json_data)
-        except json.decoder.JSONDecodeError as e:
-            print(f"Error decoding JSON at line {i + 1}: {e}")
-            # print("Problematic JSON:", line.strip())
+
+
+data = read_uniform_sample(jsonfile, n)
+
 
 points = len(data)
 
@@ -87,14 +103,14 @@ if last_data:
 
 
 # Customize the plot
-plt.title("Satellite Positions with SNR Values")
+plt.title("Satellite Positions with SNR")
 
 # Add color bar for SNR values
 snr_values = [satellite["ss"] for satellite_data in data for satellite in satellite_data.get("satellites", []) if "ss" in satellite]
 sm = plt.cm.ScalarMappable(cmap=plt.cm.viridis, norm=plt.Normalize(min(snr_values), max(snr_values)))
 sm.set_array([])  # An empty array to associate with the color map
 cbar = plt.colorbar(sm, ax=ax, orientation="vertical", pad=0.1)
-cbar.set_label("SNR Values")
+cbar.set_label("SNR")
 
 point1 = Line2D(
     [0],
