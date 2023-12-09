@@ -8,10 +8,8 @@ import numpy as np
 # from datetime import datetime
 import seaborn as sns
 import argparse
+from datetime import datetime
 
-# jsonfile = "/mnt/ramdisk/tmp/tpv.json"
-# plotfile = "/mnt/ramdisk/tmp/tpv.json.png"
-# n = 30  # Set the value of n (read every n-th line)
 
 # -------------------------------------------------------- #
 
@@ -111,15 +109,13 @@ plt.scatter(0, 0, color="red", marker="x", s=100, label="Mean Location")
 # Display mean and std in the top right corner
 text_str = f"{points:} points. STD: alt: {std_altitude:.2f}m lat: {std_latitude:.2f}m, lon: {std_longitude:.2f}m"
 
-plt.text(
-    0.5,
-    -0.18,
-    text_str,
-    transform=g.ax_joint.transAxes,
-    verticalalignment="top",
-    horizontalalignment="center",
-    bbox=dict(boxstyle="round", facecolor="white", alpha=0.8),
-)
+# Add current date and time outside the plotting area (bottom-left)
+current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+footnote = f"{current_datetime:} | {text_str:}"
+
+plt.text(0.9, -0.05, footnote, fontsize=6, family='monospace', horizontalalignment='right', transform=plt.gcf().transFigure)
+
 
 # -------------------------------------------------------- #
 # Save the plot to a file
