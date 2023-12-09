@@ -31,8 +31,16 @@ contour = args.contour
 
 # Read JSON data from the file
 with open(jsonfile, "r") as file:
-    # data = [json.loads(line) for line in file]
-    data = [json.loads(line) for i, line in enumerate(file) if i % every == 0 and json.loads(line).get("class") == "TPV"]
+    data = []
+    for i, line in enumerate(file):
+        try:
+            json_data = json.loads(line)
+            # Check if the "class" is "SKY"
+            if json_data.get("class") == "TPV" and i % every == 0:
+                data.append(json_data)
+        except json.decoder.JSONDecodeError as e:
+            print(f"Error decoding JSON at line {i + 1}: {e}")
+            #print("Problematic JSON:", line.strip())
 
 # -------------------------------------------------------- #
 
